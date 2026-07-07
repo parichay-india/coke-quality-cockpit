@@ -1,75 +1,54 @@
-# Coke Quality Cockpit — predicting CSR & CRI from coke-oven data
+# 🔥 Coke Quality Cockpit — CSR & CRI Prediction
 
-An end-to-end machine-learning project that predicts two key measures of metallurgical coke quality —
-**CSR** (Coke Strength after Reaction) and **CRI** (Coke Reactivity Index) — directly from the routine
-coal-blend and coke measurements a plant already records. It ships as an interactive
-**Streamlit dashboard**: move ten sliders, see predicted CSR and CRI on live gauges.
+Predicts two metallurgical coke-quality indices — **CSR** (Coke Strength after Reaction, higher is better)
+and **CRI** (Coke Reactivity Index, lower is better) — from routine coke-plant measurements, using data from
+**SAIL Bokaro Steel Plant** (Research & Control Laboratory, 2012–2023).
 
-> Built on the SAIL Bokaro Research & Control Laboratory dataset (≈1,221 usable days, 2012–2022).
-> Best models: **Random Forest for CRI**, **Extra Trees for CSR**.
-> Honest performance — moderate R² with small typical error (≈0.7 CRI points, ≈1.0 CSR points).
-> It is an **early-warning decision-support tool**, not a replacement for the laboratory test.
+CSR/CRI normally come from a slow furnace reaction test. This tool estimates them in seconds from quick
+proximate and Micum measurements, giving an **early-warning signal** — not a replacement for the lab test.
 
----
+## 🎛️ Live dashboard
+Eight sliders (coke moisture, ash, VM, fixed carbon, Micum M40 & M10, +80 mm & −25 mm size fractions) → live
+CRI and CSR gauges. Built with Streamlit + Plotly.
 
-## Repository layout
+## 📊 Honest performance
+The plant runs a very stable process, so CSR/CRI vary little day-to-day — which caps achievable R². The models
+are accurate in absolute terms, which is what makes them useful for early warning:
 
+| Target | Deployed model | CV R² | Typical error (MAE) |
+|---|---|---|---|
+| CRI | K-Nearest-Neighbours | ≈ 0.31 | ≈ 0.71 points |
+| CSR | Voting ensemble (RF + ExtraTrees + XGBoost) | ≈ 0.39 | ≈ 1.08 points |
+
+Fifteen models were compared by 4-fold cross-validation; see the notebook and report for the full analysis.
+
+## 📁 Repository layout
 ```
-.
-├── app.py                          # the Streamlit dashboard (entry point)
-├── requirements.txt                # Python dependencies (versions matched to the model)
-├── coke_quality_model.pkl          # the trained model bundle (loaded by app.py)
-├── .streamlit/
-│   └── config.toml                 # dark industrial theme
-├── DEPLOYMENT_GUIDE.md             # step-by-step, browser-only deployment
+├── app.py                     # Streamlit dashboard
+├── requirements.txt           # pinned to match the model file
+├── coke_quality_model.pkl     # trained models + metadata (~9 MB, compressed)
+├── .streamlit/config.toml     # dark industrial theme
+├── DEPLOYMENT_GUIDE.md         # how to update this repo & redeploy on Streamlit Cloud
 ├── notebook/
-│   └── CSR_CRI_Prediction_Coke_Oven.ipynb   # full training + model comparison (Colab/T4)
+│   └── CSR_CRI_Prediction_Coke_Oven.ipynb   # full pipeline (Colab-ready)
 └── docs/
-    └── Coke_Quality_Project_Report.docx     # the complete, beginner-friendly project report
+    └── Coke_Quality_Project_Report.docx     # complete project report
 ```
 
-**Important:** `app.py`, `requirements.txt`, and `coke_quality_model.pkl` must stay in the repository
-**root** — that is where the app and Streamlit Community Cloud look for them.
-
----
-
-## Run it locally
-
+## ▶️ Run locally
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Then open the URL Streamlit prints (usually http://localhost:8501).
+## ☁️ Deploy / update on Streamlit Cloud
+See **DEPLOYMENT_GUIDE.md**. In short: replace `app.py`, `requirements.txt` and `coke_quality_model.pkl`
+in this repo through the GitHub website, commit, and Streamlit Cloud redeploys automatically.
 
-## Publish it online (no command line)
-
-Follow **`DEPLOYMENT_GUIDE.md`**. In short: create a free GitHub repo, upload these files through the
-website, then connect the repo to [Streamlit Community Cloud](https://share.streamlit.io), which builds
-and hosts the app automatically and gives you a shareable link.
-
----
-
-## Retraining the model
-
-Open `notebook/CSR_CRI_Prediction_Coke_Oven.ipynb` in Google Colab (T4 GPU), upload
-`Coke_Oven_Dataset.xls`, and run all cells. On the first run it trains the full model zoo and
-compares ~20 models; on later runs it asks whether to rebuild or reuse the saved model. When it
-finishes it downloads a fresh **`coke_quality_model.pkl`** and a matching **`requirements.txt`** —
-replace the two files in this repo with those, and redeploy.
-
-> Keep the `.pkl` and `requirements.txt` from the **same** run together, so the dashboard's library
-> versions match the versions that built the model.
+## 🔄 Retraining
+Open the notebook in Google Colab, upload `Coke_Oven_Data_Set_New.xlsx`, and run all cells. It rebuilds
+`coke_quality_model.pkl` and a matching `requirements.txt`. Replace those two files in the repo to ship the
+new model.
 
 ---
-
-## How it works (one paragraph)
-
-The notebook cleans the Excel data, merges the coal-blend (inputs) and coke (outputs) sheets on the
-date, engineers two extra features (the ash-to-fixed-carbon ratio dominates both targets), and trains
-every model inside an identical `KNNImputer → StandardScaler → model` pipeline. It cross-validates and
-ranks them, saves the winner per target into one portable `.pkl` (along with the exact feature list,
-the ten dashboard levers, slider ranges, and median fallbacks), and the dashboard reuses that bundle
-with byte-identical feature engineering so its predictions match the notebook exactly. The full story,
-including a step-by-step code walkthrough for readers new to coke-making and data science, is in
-`docs/Coke_Quality_Project_Report.docx`.
+*Decision support for coke-oven operations — always confirm with the standard CSR/CRI reaction test.*

@@ -1,20 +1,10 @@
-# Python
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 .venv/
 venv/
 env/
-
-# OS / editor
 .DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# Streamlit local secrets
 .streamlit/secrets.toml
-
-# Local artifacts (the deployable model is tracked at repo root)
 artifacts/
-*.tmp
+*.log

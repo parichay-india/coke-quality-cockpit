@@ -1,7 +1,12 @@
+# Pinned to match coke_quality_model.pkl (built with scikit-learn 1.8.0 / numpy 2.4.4
+# / pandas 3.0.2). All ship prebuilt wheels for Python 3.11-3.14, so Streamlit Cloud
+# installs binaries in seconds (no source build). Deployed models are KNN (CRI) and a
+# Voting ensemble of scikit-learn/XGBoost estimators (CSR).
 streamlit
 numpy==2.4.4
 pandas==3.0.2
 scikit-learn==1.8.0
 scipy==1.17.1
-plotly
+xgboost==3.3.0
 joblib==1.5.3
+plotly
