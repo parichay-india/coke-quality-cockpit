@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 import joblib
 
 # ----------------------------------------------------------------------------- theme
-st.set_page_config(page_title="Coke Quality Cockpit · CSR & CRI", page_icon="🔥", layout="wide")
+st.set_page_config(page_title="CokeSense : Coke Quality Cockpit · CSR & CRI", page_icon="🔥", layout="wide")
 st.markdown("""
 <style>
 :root { --ember:#E8521E; --steel:#2A9DF4; --ink:#12181F; --panel:#1B242D; }
